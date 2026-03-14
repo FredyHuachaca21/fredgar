@@ -1,14 +1,14 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, Code2 } from "lucide-react";
+import { Menu, X, Terminal } from "lucide-react";
 import { personal } from "../data/portfolio";
 
 const links = [
   { label: "Inicio", href: "#hero" },
-  { label: "Sobre mí", href: "#about" },
+  { label: "Sobre mi", href: "#about" },
   { label: "Skills", href: "#skills" },
   { label: "Experiencia", href: "#experience" },
-  { label: "Educación", href: "#education" },
+  { label: "Educacion", href: "#education" },
   { label: "Contacto", href: "#contact" },
 ];
 
@@ -39,37 +39,46 @@ export default function Navbar() {
       initial={{ y: -80, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.6, ease: "easeOut" as const }}
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        scrolled ? "glass border-b border-white/5 shadow-lg shadow-black/20" : "bg-transparent"
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
+        scrolled
+          ? "bg-[#050507]/80 backdrop-blur-xl border-b border-white/[0.04] shadow-2xl shadow-black/40"
+          : "bg-transparent"
       }`}
     >
       <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
         {/* Logo */}
-        <a href="#hero" className="flex items-center gap-2 group">
-          <div className="w-8 h-8 rounded-lg bg-indigo-500/20 border border-indigo-500/30 flex items-center justify-center group-hover:bg-indigo-500/30 transition-colors">
-            <Code2 className="w-4 h-4 text-indigo-400" />
+        <a href="#hero" className="flex items-center gap-2.5 group">
+          <div className="w-8 h-8 rounded-md bg-[var(--accent)]/10 border border-[var(--accent)]/20 flex items-center justify-center group-hover:bg-[var(--accent)]/20 transition-all duration-300 group-hover:border-[var(--accent)]/40">
+            <Terminal className="w-3.5 h-3.5 text-[var(--accent)]" />
           </div>
-          <span className="font-bold text-sm tracking-wide group-hover:text-white transition-colors">
-            <span className="text-gradient">{personal.displayName}</span>
-            <span className="text-gray-500">.dev</span>
+          <span className="font-display font-bold text-sm tracking-wide">
+            <span className="text-gradient-forge">{personal.displayName}</span>
           </span>
         </a>
 
         {/* Desktop links */}
-        <div className="hidden md:flex items-center gap-1">
+        <div className="hidden md:flex items-center gap-0.5">
           {links.map((link) => {
             const id = link.href.replace("#", "");
+            const isActive = active === id;
             return (
               <a
                 key={link.href}
                 href={link.href}
-                className={`px-3 py-1.5 text-sm rounded-lg transition-all duration-200 ${
-                  active === id
-                    ? "text-indigo-300 bg-indigo-500/10"
-                    : "text-gray-400 hover:text-white hover:bg-white/5"
+                className={`relative px-3 py-1.5 text-[13px] rounded-md transition-all duration-300 ${
+                  isActive
+                    ? "text-[var(--accent)]"
+                    : "text-[var(--text-muted)] hover:text-[var(--text-primary)]"
                 }`}
               >
-                {link.label}
+                {isActive && (
+                  <motion.div
+                    layoutId="nav-active"
+                    className="absolute inset-0 rounded-md bg-[var(--accent)]/[0.07] border border-[var(--accent)]/15"
+                    transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                  />
+                )}
+                <span className="relative z-10">{link.label}</span>
               </a>
             );
           })}
@@ -78,7 +87,7 @@ export default function Navbar() {
         {/* Mobile toggle */}
         <button
           onClick={() => setOpen(!open)}
-          className="md:hidden w-9 h-9 flex items-center justify-center rounded-lg glass text-gray-300"
+          className="md:hidden w-9 h-9 flex items-center justify-center rounded-md forge-surface text-[var(--text-secondary)]"
         >
           {open ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
         </button>
@@ -88,18 +97,24 @@ export default function Navbar() {
       <AnimatePresence>
         {open && (
           <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            className="md:hidden glass border-t border-white/5"
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.2 }}
+            className="md:hidden bg-[var(--bg-surface)]/95 backdrop-blur-xl border-t border-white/[0.04]"
           >
             <div className="px-6 py-4 flex flex-col gap-1">
               {links.map((link) => (
                 <a
                   key={link.href}
                   href={link.href}
-                  onClick={() => setOpen(false)}
-                  className="py-2 px-3 text-sm text-gray-300 hover:text-white hover:bg-white/5 rounded-lg transition-colors"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setOpen(false);
+                    const el = document.querySelector(link.href);
+                    el?.scrollIntoView({ behavior: "smooth" });
+                  }}
+                  className="py-2.5 px-3 text-sm text-[var(--text-secondary)] hover:text-[var(--accent)] rounded-md transition-colors"
                 >
                   {link.label}
                 </a>

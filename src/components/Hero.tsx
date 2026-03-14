@@ -1,104 +1,160 @@
-import { motion } from "framer-motion";
+import { useState, useEffect, useCallback } from "react";
+import { motion, type Transition } from "framer-motion";
 import { Github, Linkedin, Mail, Phone, ChevronDown, MapPin } from "lucide-react";
 import { personal } from "../data/portfolio";
 
+const EASE: Transition = { duration: 0.8, ease: [0.22, 1, 0.36, 1] as const };
+
 const fadeUp = (delay = 0) => ({
-  initial: { opacity: 0, y: 30 },
-  animate: { opacity: 1, y: 0 },
-  transition: { duration: 0.7, delay, ease: "easeOut" as const },
+  initial: { opacity: 0, y: 40 } as const,
+  animate: { opacity: 1, y: 0 } as const,
+  transition: { ...EASE, delay },
 });
 
+/* ── Text scramble hook ── */
+const CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#$%&";
+
+function useTextScramble(target: string, startDelay = 400) {
+  const [display, setDisplay] = useState("");
+  const [done, setDone] = useState(false);
+
+  const scramble = useCallback(() => {
+    const len = target.length;
+    const duration = 60; // ms per iteration
+    const revealDelay = 3; // iterations before each char locks
+    let frame = 0;
+
+    const interval = setInterval(() => {
+      const revealed = Math.floor(frame / revealDelay);
+      let result = "";
+      for (let i = 0; i < len; i++) {
+        if (i < revealed) {
+          result += target[i];
+        } else {
+          result += CHARS[Math.floor(Math.random() * CHARS.length)];
+        }
+      }
+      setDisplay(result);
+      frame++;
+
+      if (revealed >= len) {
+        clearInterval(interval);
+        setDisplay(target);
+        setDone(true);
+      }
+    }, duration);
+
+    return () => clearInterval(interval);
+  }, [target]);
+
+  useEffect(() => {
+    const timeout = setTimeout(scramble, startDelay);
+    return () => clearTimeout(timeout);
+  }, [scramble, startDelay]);
+
+  return { display, done };
+}
+
 export default function Hero() {
+  const { display, done } = useTextScramble(personal.displayName, 500);
+
   return (
     <section
       id="hero"
       className="relative min-h-screen flex flex-col items-center justify-center px-6 overflow-hidden"
     >
-      {/* Ambient orbs */}
-      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-violet-500/8 rounded-full blur-3xl pointer-events-none" />
-
-      {/* Grid overlay */}
+      {/* Architectural grid */}
       <div
-        className="absolute inset-0 opacity-[0.02] pointer-events-none"
+        className="absolute inset-0 opacity-[0.025] pointer-events-none"
         style={{
           backgroundImage:
-            "linear-gradient(rgba(255,255,255,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.5) 1px, transparent 1px)",
-          backgroundSize: "60px 60px",
+            "linear-gradient(rgba(255,255,255,0.6) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.6) 1px, transparent 1px)",
+          backgroundSize: "80px 80px",
         }}
       />
 
+      {/* Forge glow — top left */}
+      <div className="absolute top-1/3 -left-20 w-[500px] h-[500px] bg-[var(--accent)]/[0.04] rounded-full blur-[120px] pointer-events-none" />
+      {/* Gold ambient — right */}
+      <div className="absolute bottom-1/4 -right-20 w-[400px] h-[400px] bg-[var(--accent-gold)]/[0.03] rounded-full blur-[100px] pointer-events-none" />
+
+      {/* Diagonal accent lines */}
+      <div className="absolute top-0 left-0 w-px h-[60vh] bg-gradient-to-b from-[var(--accent)]/20 via-[var(--accent)]/5 to-transparent ml-[15%] pointer-events-none hidden lg:block" />
+      <div className="absolute bottom-0 right-0 w-px h-[40vh] bg-gradient-to-t from-[var(--accent-gold)]/15 via-transparent to-transparent mr-[20%] pointer-events-none hidden lg:block" />
+
       <div className="relative z-10 max-w-4xl mx-auto text-center">
-        {/* Badge */}
-        <motion.div {...fadeUp(0.1)} className="inline-flex items-center gap-2 mb-6">
-          <div className="glass rounded-full px-4 py-1.5 text-xs font-medium text-indigo-300 border border-indigo-500/20">
-            <span className="inline-block w-1.5 h-1.5 bg-green-400 rounded-full mr-2 animate-pulse" />
-            Disponible para proyectos
+        {/* Terminal-style badge */}
+        <motion.div {...fadeUp(0.1)} className="inline-flex items-center gap-2 mb-8">
+          <div className="rounded-full px-4 py-1.5 text-xs font-mono tracking-wider text-[var(--accent)] border border-[var(--accent)]/20 bg-[var(--accent)]/[0.06]">
+            <span className="inline-block w-1.5 h-1.5 bg-[var(--accent)] rounded-full mr-2" style={{ animation: 'pulse-warm 2s ease-in-out infinite' }} />
+            disponible para proyectos
           </div>
         </motion.div>
 
-        {/* Name */}
+        {/* Name — scramble reveal */}
         <motion.h1
           {...fadeUp(0.2)}
-          className="text-5xl md:text-7xl font-bold mb-4 leading-tight tracking-tight"
+          className="font-display text-4xl sm:text-6xl md:text-8xl font-extrabold mb-3 leading-[0.95] tracking-tight"
         >
-          <span className="text-gradient">{personal.displayName}</span>
+          <span className={`text-gradient-forge inline-block font-mono ${done ? "" : "opacity-90"}`}>
+            {display || "\u00A0"}
+          </span>
         </motion.h1>
 
         {/* Full name subtle */}
         <motion.p
-          {...fadeUp(0.25)}
-          className="text-sm text-gray-600 mb-1 font-mono tracking-widest"
+          {...fadeUp(0.28)}
+          className="text-xs text-[var(--text-muted)] mb-2 font-mono tracking-[0.3em] uppercase"
         >
           {personal.name}
         </motion.p>
 
         {/* Title */}
         <motion.p
-          {...fadeUp(0.3)}
-          className="text-xl md:text-2xl text-gray-400 mb-3 font-light"
+          {...fadeUp(0.35)}
+          className="text-lg md:text-2xl text-[var(--text-secondary)] mb-2 font-display font-medium"
         >
           {personal.title}
         </motion.p>
 
-        {/* Subtitle */}
+        {/* Subtitle — tech stack */}
         <motion.p
-          {...fadeUp(0.35)}
-          className="text-sm md:text-base text-indigo-400/70 mb-6 font-mono tracking-wide"
+          {...fadeUp(0.4)}
+          className="text-sm text-[var(--text-muted)] mb-8 font-mono tracking-wide"
         >
           {personal.subtitle}
         </motion.p>
 
         {/* Location */}
-        <motion.div {...fadeUp(0.4)} className="flex items-center justify-center gap-1.5 mb-10 text-gray-500 text-sm">
-          <MapPin className="w-3.5 h-3.5" />
+        <motion.div {...fadeUp(0.45)} className="flex items-center justify-center gap-1.5 mb-10 text-[var(--text-muted)] text-sm">
+          <MapPin className="w-3.5 h-3.5 text-[var(--accent)]/50" />
           <span>{personal.location}</span>
         </motion.div>
 
         {/* CTA Buttons */}
-        <motion.div {...fadeUp(0.5)} className="flex flex-wrap gap-4 justify-center mb-12">
+        <motion.div {...fadeUp(0.55)} className="flex flex-wrap gap-4 justify-center mb-14">
           <a
             href="#contact"
-            className="group px-6 py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl font-medium text-sm transition-all duration-300 hover:shadow-lg hover:shadow-indigo-500/25 hover:-translate-y-0.5"
+            className="group relative px-7 py-3 bg-[var(--accent)] hover:bg-[#ff7f50] text-[#050507] rounded-lg font-display font-bold text-sm transition-all duration-300 hover:shadow-xl hover:shadow-[var(--accent)]/20 hover:-translate-y-0.5 overflow-hidden"
           >
-            Contactar
-            <span className="ml-2 opacity-0 group-hover:opacity-100 transition-opacity">→</span>
+            <span className="relative z-10">Contactar</span>
+            <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent translate-x-[-200%] group-hover:translate-x-[200%] transition-transform duration-700" />
           </a>
           <a
             href="#experience"
-            className="px-6 py-3 glass hover:bg-white/8 text-gray-300 hover:text-white rounded-xl font-medium text-sm transition-all duration-300 hover:-translate-y-0.5"
+            className="px-7 py-3 border border-white/10 hover:border-[var(--accent)]/30 text-[var(--text-secondary)] hover:text-[var(--text-primary)] rounded-lg font-display font-medium text-sm transition-all duration-300 hover:-translate-y-0.5 hover:bg-[var(--accent)]/[0.04]"
           >
             Ver experiencia
           </a>
         </motion.div>
 
         {/* Social links */}
-        <motion.div {...fadeUp(0.6)} className="flex items-center justify-center gap-4">
+        <motion.div {...fadeUp(0.65)} className="flex items-center justify-center gap-3">
           {[
             { icon: Github, href: personal.github, label: "GitHub" },
             { icon: Linkedin, href: personal.linkedin, label: "LinkedIn" },
             { icon: Mail, href: `mailto:${personal.email}`, label: "Email" },
-            { icon: Phone, href: `tel:${personal.phone}`, label: "Phone" },
+            { icon: Phone, href: `https://wa.me/${personal.phone.replace(/\D/g, "")}`, label: "WhatsApp" },
           ].map(({ icon: Icon, href, label }) => (
             <a
               key={label}
@@ -106,7 +162,7 @@ export default function Hero() {
               target={href.startsWith("http") ? "_blank" : undefined}
               rel="noopener noreferrer"
               aria-label={label}
-              className="w-10 h-10 glass rounded-xl flex items-center justify-center text-gray-400 hover:text-indigo-300 hover:border-indigo-500/40 transition-all duration-200 hover:-translate-y-0.5"
+              className="w-10 h-10 rounded-lg border border-white/[0.06] bg-white/[0.02] flex items-center justify-center text-[var(--text-muted)] hover:text-[var(--accent)] hover:border-[var(--accent)]/30 hover:bg-[var(--accent)]/[0.06] transition-all duration-300 hover:-translate-y-0.5"
             >
               <Icon className="w-4 h-4" />
             </a>
@@ -118,15 +174,15 @@ export default function Hero() {
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ delay: 1.2 }}
-        className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 text-gray-600"
+        transition={{ delay: 1.5 }}
+        className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-[var(--text-muted)]"
       >
-        <span className="text-xs">scroll</span>
+        <span className="text-[10px] font-mono tracking-[0.25em] uppercase">scroll</span>
         <motion.div
-          animate={{ y: [0, 6, 0] }}
-          transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+          animate={{ y: [0, 8, 0] }}
+          transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
         >
-          <ChevronDown className="w-4 h-4" />
+          <ChevronDown className="w-4 h-4 text-[var(--accent)]/40" />
         </motion.div>
       </motion.div>
     </section>
