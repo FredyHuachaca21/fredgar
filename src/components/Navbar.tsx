@@ -10,6 +10,7 @@ const links = [
   { label: "Experiencia", href: "#experience" },
   { label: "Educacion", href: "#education" },
   { label: "Contacto", href: "#contact" },
+  { label: "Tienda", href: "#tienda" },
 ];
 
 export default function Navbar() {

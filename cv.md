@@ -32,12 +32,14 @@ Backend Developer con más de **5 años de experiencia** en desarrollo de micros
 ### **Tata Consultancy Services (TCS)** | *IT Analyst (Cliente: BCP)*
 *Lima, Perú | 05/2025 – 12/2025*
 
-* **Migración de Datos de Consentimiento (Proyecto Master Repository):** Lideré la transición de marcas de consentimiento más de 30 millones de clientes en producción desde Azure SQL hacia el equipo de Master Repository, diseñando pipelines ETL en **Azure Data Factory** con reglas de sanitización específicas y extracción automatizada a archivos TXT.
-* **Automatización de Extracciones:** Implementé **triggers diarios** para la extracción incremental de marcas de consentimiento (D-1) y un flujo de ejecución bajo demanda para la data histórica, garantizando consistencia y trazabilidad en cada proceso.
-* **Logs de Auditoría y Observabilidad:** Diseñé e integré un sistema de logs de auditoría en base de datos para todos los procesos de extracción, asegurando el cumplimiento de requisitos regulatorios del sector financiero peruano.
-* **Notificaciones a Stakeholders:** Integré notificaciones automáticas a **Microsoft Teams vía Webhooks**, proporcionando tarjetas informativas con el estado de cada ejecución (éxito/error), facilitando el seguimiento a líderes no técnicos del proyecto.
-* **Microservicio Asíncrono de Sincronización:** Desarrollé un microservicio con **Quarkus y Apache Kafka** para la sincronización asíncrona de marcas de consentimiento entre el sistema legacy y el nuevo servicio de Master Repository, eliminando duplicidad de datos y asegurando la integridad para auditorías de entidades reguladoras.
-* **Desarrollo de Microservicios de Negocio:** Participé en el mantenimiento, corrección de bugs y migración de frameworks de microservicios existentes, y desarrollé un microservicio de negocio desde cero hasta su pase a producción.
+* **Migración de Datos de Consentimiento (Proyecto Master Repository):** Lideré la transición de marcas de consentimiento de **+30 millones de registros** desde Azure SQL hacia el equipo de Master Repository, diseñando pipelines ETL en **Azure Data Factory** con reglas de sanitización específicas y extracción automatizada a archivos TXT.
+* **Optimización de Queries:** Diseñé consultas SQL optimizadas para el procesamiento eficiente de la data histórica de +30M registros, garantizando la integridad referencial y minimizando el impacto en la base de datos productiva.
+* **Automatización de Extracciones:** Implementé **triggers diarios** para la extracción incremental de marcas de consentimiento (D-1) y un flujo de ejecución bajo demanda para la data histórica, garantizando consistencia y trazabilidad.
+* **Observabilidad y Auditoría:** Diseñé un sistema de logs de auditoría en BD con métricas detalladas: hora de inicio/fin, tipo de ejecución (diario/histórico), tiempo de proceso, registros totales, duplicados, únicos y ruta destino; asegurando cumplimiento regulatorio del sector financiero peruano.
+* **Notificaciones a Stakeholders:** Integré notificaciones automáticas a **Microsoft Teams vía Webhooks** con tarjetas informativas del estado de cada ejecución (éxito/error), facilitando el seguimiento a líderes no técnicos del proyecto.
+* **Microservicio Asíncrono de Sincronización:** Desarrollé un microservicio con **Quarkus y Apache Kafka** para la sincronización asíncrona de marcas de consentimiento entre el sistema legacy y el nuevo servicio de Master Repository, eliminando duplicidad de datos y asegurando integridad para auditorías de entidades reguladoras.
+* **Desarrollo de Microservicios de Negocio:** Participé en el mantenimiento, corrección de bugs y migración de frameworks de microservicios existentes, y desarrollé un microservicio de negocio end-to-end hasta su pase a producción.
+
 
 ### **Tata Consultancy Services (TCS)** | *IT Analyst (Cliente: Interbank)*
 *Lima, Perú | 2023 – 04/2025*
